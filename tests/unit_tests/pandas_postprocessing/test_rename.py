@@ -150,6 +150,33 @@ def test_should_raise_exception_duplication_on_multiindex():
         )
 
 
+def test_should_raise_exception_partial_duplication():
+    with pytest.raises(InvalidPostProcessingError):
+        pp.rename(
+            df=categories_df,
+            columns={
+                "constant": "category",
+                "dept": "dept_newname",
+            },
+        )
+
+
+def test_should_raise_exception_partial_duplication_on_multiindex():
+    iterables = [["m1", "m2", "m3"], ["a", "b"]]
+    columns = pd.MultiIndex.from_product(iterables, names=[None, "level1"])
+    df = pd.DataFrame(index=[0, 1, 2], columns=columns, data=1)
+
+    with pytest.raises(InvalidPostProcessingError):
+        pp.rename(
+            df=df,
+            columns={
+                "m1": "m2",
+                "m3": "new_m3",
+            },
+            level=0,
+        )
+
+
 def test_should_raise_exception_invalid_level():
     with pytest.raises(InvalidPostProcessingError):  # noqa: PT012
         pp.rename(
