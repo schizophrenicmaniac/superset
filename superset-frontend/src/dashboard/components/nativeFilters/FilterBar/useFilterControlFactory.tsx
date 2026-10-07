@@ -72,7 +72,10 @@ export const useFilterControlFactory = (
           dataMaskSelected={dataMaskSelected}
           filter={filter}
           onFilterSelectionChange={onFilterSelectionChange}
-          inView={false}
+          // Filters that must apply their first value have to load even when
+          // no OutPortal shows them, e.g. while in the closed "More filters"
+          // dropdown of the horizontal bar
+          inView={!!filter.requiredFirst}
           orientation={filterBarOrientation}
           overflow={overflow}
           clearAllTrigger={clearAllTriggers?.[filter.id]}

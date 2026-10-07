@@ -671,7 +671,6 @@ const FilterControls: FC<FilterControlsProps> = ({
                 }
               : undefined
           }
-          forceRender={hasRequiredFirst}
           ref={popoverRef}
           onOverflowingStateChange={({ overflowed: nextOverflowedIds }) => {
             if (

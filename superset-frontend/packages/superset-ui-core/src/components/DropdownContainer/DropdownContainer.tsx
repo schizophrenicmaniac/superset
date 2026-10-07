@@ -389,6 +389,10 @@ export const DropdownContainer = forwardRef(
               }}
               placement="bottom"
               forceRender={forceRender}
+              // Unless asked to render ahead of time, the overflowed items are
+              // only mounted while the popover is open, the one state in which
+              // the overflow index is not recalculated underneath them.
+              destroyOnHidden={!forceRender}
               fresh // This prop prevents caching and stale data for filter scoping.
             >
               <Tooltip title={dropdownTriggerTooltip}>

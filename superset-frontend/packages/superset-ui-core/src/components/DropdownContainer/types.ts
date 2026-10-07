@@ -83,7 +83,8 @@ export interface DropdownContainerProps {
    */
   style?: CSSProperties;
   /**
-   * Force render popover content before it's first opened
+   * Force render popover content before it's first opened and keep it
+   * mounted while closed. Otherwise it is only mounted while open.
    */
   forceRender?: boolean;
 }

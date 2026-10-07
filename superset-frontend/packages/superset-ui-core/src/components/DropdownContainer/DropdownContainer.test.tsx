@@ -17,7 +17,7 @@
  * under the License.
  */
 import type { CSSProperties } from 'react';
-import { screen, render } from '@superset-ui/core/spec';
+import { screen, render, userEvent, waitFor } from '@superset-ui/core/spec';
 import { Button, DropdownContainer, Icons } from '..';
 
 const generateItems = (n: number) =>
@@ -248,4 +248,31 @@ test('clips the item row while remeasuring, then restores it', () => {
    * the new overflow index is applied the consumer's value comes back. */
   expect(measured[0]).toBe('hidden');
   expect(measured.at(-1)).toBe('visible');
+});
+
+test('only mounts the overflowed items while the dropdown is open', async () => {
+  mockBoundingRects(() => {});
+  const { rerender } = render(<DropdownContainer items={generateItems(3)} />);
+  rerender(<DropdownContainer items={generateItems(3)} />);
+  const trigger = screen.getByTestId('dropdown-container-btn');
+  expect(screen.queryByText('Element 3')).not.toBeInTheDocument();
+
+  await userEvent.click(trigger);
+  expect(await screen.findByText('Element 3')).toBeInTheDocument();
+
+  await userEvent.click(trigger);
+  await waitFor(() =>
+    expect(screen.queryByText('Element 3')).not.toBeInTheDocument(),
+  );
+});
+
+test('keeps the overflowed items mounted while closed with forceRender', () => {
+  mockBoundingRects(() => {});
+  const { rerender } = render(
+    <DropdownContainer items={generateItems(3)} forceRender />,
+  );
+  rerender(<DropdownContainer items={generateItems(3)} forceRender />);
+
+  expect(screen.getByTestId('dropdown-container-btn')).toBeInTheDocument();
+  expect(screen.getByText('Element 3')).toBeInTheDocument();
 });
