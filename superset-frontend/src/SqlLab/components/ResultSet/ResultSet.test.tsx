@@ -24,7 +24,7 @@ import {
   fireEvent,
   within,
 } from 'spec/helpers/testing-library';
-import configureStore from 'redux-mock-store';
+import configureMockStore from 'redux-mock-store';
 import { Store } from 'redux';
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
@@ -165,7 +165,7 @@ beforeEach(() => {
 });
 
 const middlewares = [thunk];
-const mockStore = configureStore(middlewares);
+const mockStore = configureMockStore(middlewares);
 const setup = (props?: any, store?: Store) =>
   render(<ResultSet {...props} />, {
     useRedux: true,

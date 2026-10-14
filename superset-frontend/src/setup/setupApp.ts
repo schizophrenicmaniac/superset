@@ -17,7 +17,7 @@
  * under the License.
  */
 /* eslint global-require: 0 */
-import $ from 'jquery';
+import jquery from 'jquery';
 import {
   SupersetClient,
   getClientErrorObject,
@@ -40,15 +40,15 @@ function showApiMessage(resp: ClientErrorObject) {
     '<button type="button" class="close" ' +
     'data-dismiss="alert">\xD7</button> </div>';
   const severity = resp.severity || 'info';
-  $(template)
+  jquery(template)
     .addClass(`alert-${severity}`)
     .append(sanitizeHtml(resp.message || ''))
-    .appendTo($('#alert-container'));
+    .appendTo(jquery('#alert-container'));
 }
 
 function toggleCheckbox(apiUrlPrefix: string, selector: string) {
   SupersetClient.get({
-    endpoint: apiUrlPrefix + ($(selector)[0] as HTMLInputElement).checked,
+    endpoint: apiUrlPrefix + (jquery(selector)[0] as HTMLInputElement).checked,
   })
     .then(() => undefined)
     .catch(response =>
@@ -61,18 +61,18 @@ function toggleCheckbox(apiUrlPrefix: string, selector: string) {
 }
 
 export default function setupApp() {
-  $(document).ready(function () {
-    $(':checkbox[data-checkbox-api-prefix]').change(function (
+  jquery(document).ready(function () {
+    jquery(':checkbox[data-checkbox-api-prefix]').change(function (
       this: HTMLElement,
     ) {
-      const $this = $(this);
+      const $this = jquery(this);
       const prefix = $this.data('checkbox-api-prefix');
       const id = $this.attr('id');
       toggleCheckbox(prefix, `#${id}`);
     });
 
     // for language picker dropdown
-    $<HTMLAnchorElement>('#language-picker a').click(function (
+    jquery<HTMLAnchorElement>('#language-picker a').click(function (
       ev: JQuery.ClickEvent<
         HTMLAnchorElement,
         null,
@@ -92,8 +92,8 @@ export default function setupApp() {
 
   // A set of hacks to allow apps to run within a FAB template
   // this allows for the server side generated menus to function
-  window.$ = $;
-  window.jQuery = $;
+  window.$ = jquery;
+  window.jQuery = jquery;
 
   // set up app wide custom error messages
   setupErrorMessages();

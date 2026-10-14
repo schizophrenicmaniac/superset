@@ -22,7 +22,7 @@ import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
 import { MemoryRouter } from 'react-router-dom';
 import thunk from 'redux-thunk';
-import configureStore from 'redux-mock-store';
+import configureMockStore from 'redux-mock-store';
 import { ReactNode } from 'react';
 import { ListView, type ListViewProps } from './ListView';
 import { ListViewFilterOperator, type ListViewFetchDataConfig } from './types';
@@ -51,7 +51,7 @@ type MockedListViewProps = Omit<
 };
 
 const middlewares = [thunk];
-const mockStore = configureStore(middlewares);
+const mockStore = configureMockStore(middlewares);
 
 const fetchSelectsMock = jest.fn(() =>
   Promise.resolve({ data: [], totalCount: 0 }),

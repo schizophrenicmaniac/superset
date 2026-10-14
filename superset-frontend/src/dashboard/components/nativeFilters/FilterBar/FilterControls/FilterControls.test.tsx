@@ -19,7 +19,7 @@
 import { render, screen } from 'spec/helpers/testing-library';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
-import configureStore from 'redux-mock-store';
+import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { stateWithoutNativeFilters } from 'spec/fixtures/mockStore';
 import {
@@ -30,7 +30,7 @@ import { styled } from '@apache-superset/core/theme';
 import { FilterBarOrientation } from 'src/dashboard/types';
 import FilterControls from './FilterControls';
 
-const mockStore = configureStore([thunk]);
+const mockStore = configureMockStore([thunk]);
 
 const mockStoreForCustomization = {
   ...stateWithoutNativeFilters,

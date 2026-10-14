@@ -17,13 +17,13 @@
  * under the License.
  */
 import { waitFor, render, fireEvent } from 'spec/helpers/testing-library';
-import configureStore from 'redux-mock-store';
+import configureMockStore from 'redux-mock-store';
 import fetchMock from 'fetch-mock';
 import thunk from 'redux-thunk';
 import mockDatasource from 'spec/fixtures/mockDatasource';
 import ChangeDatasourceModal from '.';
 
-const mockStore = configureStore([thunk]);
+const mockStore = configureMockStore([thunk]);
 const store = mockStore({});
 
 const mockedProps = {

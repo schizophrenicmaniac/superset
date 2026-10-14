@@ -17,10 +17,10 @@
  * under the License.
  */
 import { render, screen, userEvent } from 'spec/helpers/testing-library';
-import ZoomConfigControl from './ZoomConfigControl';
+import { ZoomConfigControl } from './ZoomConfigControl';
 import { ZoomConfigs } from './types';
 
-jest.mock('./ZoomConfigsChart', () => () => null);
+jest.mock('./ZoomConfigsChart', () => ({ ZoomConfigsChart: () => null }));
 
 jest.mock('../ColumnConfigControl/ControlForm', () => {
   const nextValues: Record<string, number> = {

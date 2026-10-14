@@ -17,7 +17,7 @@
  * under the License.
  */
 import thunk from 'redux-thunk';
-import configureStore from 'redux-mock-store';
+import configureMockStore from 'redux-mock-store';
 
 import {
   ensureIsArray,
@@ -96,7 +96,7 @@ const baseFormData = {
   datasource: 'table__1',
 };
 
-const mockStore = configureStore([thunk]);
+const mockStore = configureMockStore([thunk]);
 const store = mockStore({ explore: {} });
 
 function setup({

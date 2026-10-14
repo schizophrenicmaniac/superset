@@ -46,7 +46,7 @@ import {
 } from 'src/dashboard/actions/dashboardLayout';
 import { DASHBOARD_HEADER_ID } from 'src/dashboard/util/constants';
 import { getUrlParam } from 'src/utils/urlUtils';
-import DashboardPage from './DashboardPage';
+import { DashboardPage } from './DashboardPage';
 
 const mockTheme = {
   id: 42,

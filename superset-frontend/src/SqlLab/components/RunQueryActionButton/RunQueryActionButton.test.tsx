@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import configureStore from 'redux-mock-store';
+import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { Store } from 'redux';
 import { supersetTheme } from '@apache-superset/core/theme';
@@ -29,7 +29,7 @@ import RunQueryActionButton, {
 } from 'src/SqlLab/components/RunQueryActionButton';
 
 const middlewares = [thunk];
-const mockStore = configureStore(middlewares);
+const mockStore = configureMockStore(middlewares);
 
 jest.mock('@superset-ui/core/components/Select/Select', () => () => (
   <div data-test="mock-deprecated-select-select" />

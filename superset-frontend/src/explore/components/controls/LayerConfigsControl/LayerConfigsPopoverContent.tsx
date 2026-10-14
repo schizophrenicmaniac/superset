@@ -25,7 +25,8 @@ import { Form } from '@superset-ui/core/components/Form';
 import Tabs from '@superset-ui/core/components/Tabs';
 import { Data as GsData } from 'geostyler-data';
 import { Style as GsStyle } from 'geostyler-style';
-import WfsDataParser, {
+import {
+  WfsDataParser,
   RequestParams1_1_0,
   RequestParams2_0_0,
 } from 'geostyler-wfs-parser';
@@ -41,7 +42,7 @@ import {
 } from './types';
 import { getServiceVersions, hasAllRequiredWfsParams } from './serviceUtil';
 import { ControlFormItem } from '../ColumnConfigControl/ControlForm';
-import GeoStylerWrapper from './GeoStylerWrapper';
+import { GeoStylerWrapper } from './GeoStylerWrapper';
 
 // Enum for the different tabs
 const LAYER_CONFIG_TABS = {
