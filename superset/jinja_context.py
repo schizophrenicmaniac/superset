@@ -738,7 +738,9 @@ class ExtraCache:
         from a dashboard.
 
         :param column: Name of the temporal column. Leave undefined to reference the
-            time range from a Dashboard Native Time Range filter (when present).
+            time range from a Dashboard Native Time Range filter (when present). In
+            that case the column targeted by the time range filter is used for
+            `target_type` and `remove_filter`.
         :param default: The default value to fall back to if the time filter is
             not present, or has the value `No filter`
         :param target_type: The target temporal type as recognized by the target
@@ -760,6 +762,7 @@ class ExtraCache:
         convert_legacy_filters_into_adhoc(form_data)
         merge_extra_filters(form_data)
         time_range = form_data.get("time_range")
+        column = column or self._get_time_range_column(form_data, time_range)
         if column:
             flt: AdhocFilterClause | None = next(
                 (
@@ -799,6 +802,27 @@ class ExtraCache:
             from_expr=_format_dttm(from_expr),
             to_expr=_format_dttm(to_expr),
             time_range=time_range,
+        )
+
+    @staticmethod
+    def _get_time_range_column(
+        form_data: dict[str, Any], time_range: str | None
+    ) -> str | None:
+        """Get the column of the temporal filter carrying the given time range.
+
+        Used when ``get_time_filter`` is called without a column, so that the
+        column type is used for formatting and the filter can be removed from
+        the outer query.
+        """
+        return next(
+            (
+                flt["subject"]
+                for flt in form_data.get("adhoc_filters", [])
+                if flt.get("operator") == FilterOperator.TEMPORAL_RANGE
+                and isinstance(flt.get("subject"), str)
+                and flt.get("comparator") == (time_range or NO_TIME_RANGE)
+            ),
+            None,
         )
 
 

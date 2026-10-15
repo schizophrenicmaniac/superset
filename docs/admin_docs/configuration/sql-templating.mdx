@@ -504,7 +504,8 @@ the outer query) also gives many database engines the opportunity to optimize th
 The macro takes the following parameters:
 
 - `column`: Name of the temporal column. Leave undefined to reference the time range from a Dashboard Native Time Range
-  filter (when present).
+  filter (when present). In that case the column targeted by the time range filter is used for `target_type` and
+  `remove_filter`.
 - `default`: The default value to fall back to if the time filter is not present, or has the value `No filter`
 - `target_type`: The target temporal type as recognized by the target database (e.g. `TIMESTAMP`, `DATE` or
   `DATETIME`). If `column` is defined, the format will default to the type of the column. This is used to produce

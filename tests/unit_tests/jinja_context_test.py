@@ -2227,6 +2227,104 @@ def test_metric_macro_embedded_user_skips_base_filter(mocker: MockerFixture) -> 
             ["dttm"],
             ["dttm"],
         ),
+        (
+            "Time range without column uses the format of the temporal filter column",
+            [],
+            {"remove_filter": True},
+            "postgresql://mydb",
+            [
+                {
+                    "time_range": "Last week",
+                    "filters": [
+                        {
+                            "col": "dt",
+                            "op": "TEMPORAL_RANGE",
+                            "val": "No filter",
+                        },
+                    ],
+                }
+            ],
+            TimeFilter(
+                from_expr="TO_DATE('2024-08-27', 'YYYY-MM-DD')",
+                to_expr="TO_DATE('2024-09-03', 'YYYY-MM-DD')",
+                time_range="Last week",
+            ),
+            ["dt"],
+            ["dt"],
+        ),
+        (
+            "Default without column uses the format of the temporal filter column",
+            [],
+            {"default": "Last week"},
+            "postgresql://mydb",
+            [
+                {
+                    "filters": [
+                        {
+                            "col": "dt",
+                            "op": "TEMPORAL_RANGE",
+                            "val": "No filter",
+                        },
+                    ],
+                }
+            ],
+            TimeFilter(
+                from_expr="TO_DATE('2024-08-27', 'YYYY-MM-DD')",
+                to_expr="TO_DATE('2024-09-03', 'YYYY-MM-DD')",
+                time_range="Last week",
+            ),
+            [],
+            ["dt"],
+        ),
+        (
+            "Explicit target_type overrides the temporal filter column format",
+            [],
+            {"target_type": "TIMESTAMP"},
+            "postgresql://mydb",
+            [
+                {
+                    "time_range": "Last week",
+                    "filters": [
+                        {
+                            "col": "dt",
+                            "op": "TEMPORAL_RANGE",
+                            "val": "Last week",
+                        },
+                    ],
+                }
+            ],
+            TimeFilter(
+                from_expr="TO_TIMESTAMP('2024-08-27 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.US')",  # noqa: E501
+                to_expr="TO_TIMESTAMP('2024-09-03 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.US')",  # noqa: E501
+                time_range="Last week",
+            ),
+            [],
+            ["dt"],
+        ),
+        (
+            "Temporal filter with a different time range is ignored without column",
+            [],
+            {"target_type": "TIMESTAMP", "remove_filter": True},
+            "postgresql://mydb",
+            [
+                {
+                    "filters": [
+                        {
+                            "col": "dt",
+                            "op": "TEMPORAL_RANGE",
+                            "val": "Last month",
+                        },
+                    ],
+                }
+            ],
+            TimeFilter(
+                from_expr=None,
+                to_expr=None,
+                time_range="No filter",
+            ),
+            [],
+            [],
+        ),
     ],
 )
 def test_get_time_filter(
