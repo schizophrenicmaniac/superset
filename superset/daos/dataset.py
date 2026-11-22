@@ -713,12 +713,11 @@ class DatasetDAO(BaseDAO[SqlaTable]):
             if model.partition_column
             else None
         )
-        # `_upsert_columns` and `_override_columns` insert a new column with
-        # `db.session.add(TableColumn(..., table_id=model.id))` rather than
-        # appending to this relationship, and `BaseDAO.update` does not flush --
-        # so a column created *and* given a transform in the same request was
-        # invisible here and kept it. That is exactly the stray transform this
-        # method exists to clear, waiting for the mapping to resolve back to it.
+        # `BaseDAO.update` does not flush, and the loaded collection can be out
+        # of step with the session after the column writes -- a column created
+        # *and* given a transform in the same request was once invisible here
+        # and kept it. That is exactly the stray transform this method exists
+        # to clear, waiting for the mapping to resolve back to it.
         db.session.flush()
         db.session.expire(model, ["columns"])
         for column in model.columns:
@@ -840,7 +839,7 @@ class DatasetDAO(BaseDAO[SqlaTable]):
                     for key, value in properties.items()
                     if key not in protected_keys
                 }
-                db.session.add(TableColumn(**{**cleaned, "table_id": model.id}))
+                model.columns.append(TableColumn(**cleaned))
 
         return set(incoming_by_name)
 
@@ -864,7 +863,9 @@ class DatasetDAO(BaseDAO[SqlaTable]):
 
         for properties in property_columns:
             if "id" not in properties:
-                db.session.add(TableColumn(**{**properties, "table_id": model.id}))
+                # Through the relationship, as in ``update_metrics``, so the
+                # versioning hooks can resolve ``column.table``.
+                model.columns.append(TableColumn(**properties))
                 surviving_column_names.add(properties["column_name"])
 
         for properties in property_columns_by_id.values():
@@ -876,8 +877,8 @@ class DatasetDAO(BaseDAO[SqlaTable]):
             surviving_column_names.add(col.column_name)
 
         ids_to_keep = property_columns_by_id.keys()
-        for col in model.columns:
-            if col.id not in ids_to_keep:
+        for col_id, col in columns_by_id.items():
+            if col_id not in ids_to_keep:
                 db.session.delete(col)
 
         return surviving_column_names
@@ -940,10 +941,13 @@ class DatasetDAO(BaseDAO[SqlaTable]):
             if "id" in properties
         }
 
-        # Insert new metrics
+        # Insert new metrics through the relationship rather than by
+        # ``table_id``: the versioning hooks find the dataset via
+        # ``metric.table``, and without it a save that only adds metrics
+        # doesn't move the dataset version, so its ETag goes stale.
         for properties in property_metrics:
             if "id" not in properties:
-                db.session.add(SqlMetric(**{**properties, "table_id": model.id}))
+                model.metrics.append(SqlMetric(**properties))
 
         # Update existing metrics
         for properties in property_metrics_by_id.values():
@@ -957,8 +961,8 @@ class DatasetDAO(BaseDAO[SqlaTable]):
 
         # Delete removed metrics
         ids_to_keep = property_metrics_by_id.keys()
-        for metric in model.metrics:
-            if metric.id not in ids_to_keep:
+        for metric_id, metric in metrics_by_id.items():
+            if metric_id not in ids_to_keep:
                 db.session.delete(metric)
 
     @classmethod

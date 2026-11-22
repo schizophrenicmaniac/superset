@@ -1130,7 +1130,7 @@ def test_a_transform_on_a_column_added_in_the_same_request_is_cleared(
     session: Session,
 ) -> None:
     """
-    `_upsert_columns` inserts a new column by FK rather than through the
+    `_upsert_columns` used to insert a new column by FK rather than through the
     `columns` relationship, and `BaseDAO.update` does not flush -- so a column
     created *and* given a transform in one request was invisible to the clearing
     loop and kept it, waiting for the mapping to resolve back to it.

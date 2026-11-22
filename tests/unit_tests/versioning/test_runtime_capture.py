@@ -863,3 +863,36 @@ def test_capture_after_savepoint_and_unrelated_flush(
     capture_session.commit()
     shadow: Any = version_class(Dashboard)
     assert capture_session.scalars(sa.select(shadow.dashboard_title)).all() == ["last"]
+
+
+@pytest.mark.parametrize(
+    "children,new_child",
+    [
+        ("metrics", {"metric_name": "added", "expression": "SUM(x)"}),
+        ("columns", {"column_name": "added", "expression": "x + 1"}),
+    ],
+)
+def test_save_that_only_adds_a_child_records_a_dataset_version(
+    capture_session: Session, children: str, new_child: dict[str, Any]
+) -> None:
+    """A new metric or column alone moves the dataset version (and its ETag)."""
+    from superset.daos.dataset import DatasetDAO
+
+    database: Database = Database(database_name="db", sqlalchemy_uri="sqlite://")
+    dataset: SqlaTable = SqlaTable(table_name="t", database=database)
+    dataset.columns = [TableColumn(column_name="x", type="INTEGER")]
+    dataset.metrics = [SqlMetric(metric_name="count", expression="COUNT(*)")]
+    capture_session.add(dataset)
+    capture_session.commit()
+    shadow: Any = version_class(SqlaTable)
+    before: int = capture_session.query(shadow).filter_by(id=dataset.id).count()
+
+    existing: list[dict[str, Any]] = [
+        {"id": child.id} for child in getattr(dataset, children)
+    ]
+    DatasetDAO.update(dataset, {children: [*existing, new_child]})
+    capture_session.commit()
+
+    assert capture_session.query(shadow).filter_by(id=dataset.id).count() == before + 1
+    capture_session.expire_all()
+    assert len(getattr(capture_session.get(SqlaTable, dataset.id), children)) == 2
